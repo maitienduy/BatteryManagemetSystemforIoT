@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+    <style>
+        html {
+            padding: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header text-center">
+        <h1>Battery Monitoring System</h1>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+    <div class="col-sm-12">
+        <div style="text-align: center; width: 30%; margin: 10px auto" class="well">
+            <h4><span class="fa fa-user"></span> Welcome <%= user.username %></h4>
+        </div>
+    </div>
+    <a onclick="refresh()" class="btn btn-danger btn-sm">refresh data</a>
+    <a href="/dashboard" class="btn btn-danger btn-sm">Add device</a>
+    <a href="/detail" class="btn btn-danger btn-sm">list all device</a>
+
+    <div id="content" class="table-responsive">
+        <table class="table table-bordered table-first-center table-hover">
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Device name</th>
+                <th scope="col">Voltage</th>
+                <th scope="col">Property</th>
+                <th scope="col">Status</th>
+
+                <th scope="col">Date</th>
+                <th scope="col">Battery Capacity (mah)</th>
+                <th scope="col">Power consumption (mah)</th>
+                <th scope="col">Estimated run time (hours)</th>
+                <th scope="col"></th>
+                <th scope="col">Send</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            <% if(data.length){
+
+            for(var i = 0;i < data.length;i++) { %>
+
+                <tr>
+                    <td><%= (i + 1) %></td>
+                    <td><input id="test<%= i %>" value="<%= data[i].device %>" onclick="logData(<%= i %>)" readonly/>
+                    </td>
+                    <td><%= data[i].voltage %></td>
+                    <td><%= data[i].prob %></td>
+                    <td><%= data[i].status %></td>
+                    <td><%= data[i].date %></td>
+                    <td><%= data[i].battery %></td>
+                    <td><%= data[i].power_consumption %></td>
+                    <td><%= data[i].estimate_time %></td>
+                    <td>
+                        <button id="del<%= data[i].device %>" class="btn btn-danger btn-sm"
+                                onclick="deleteTypeData('<%= data[i].device %>')">Delete
+                        </button>
+                    </td>
+                    <td>
+                        <input id="input<%= data[i].device %>"/>
+                        <button id="send<%= data[i].device %>" class="btn btn-danger btn-sm"
+                                onclick="sendData('<%= data[i].device %>')">Send
+                        </button>
+                    </td>
+
+                </tr>
+            <% }
+
+            }else{ %>
+                <tr>
+                    <td colspan="9">No Data</td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+
+<script>
+setInterval(() => {
+  window.location.reload();
+
+}, 60000)
+
+//getdata();
+function refresh() {
+  window.location.reload();
+}
+
+
+    function deleteTypeData(device) {
+        console.log("device.device", device)
+        $.ajax({
+            url: "/devices_type/" + device,
+            type: 'DELETE',
+            success: function (res) {
+
+                window.location.reload();
+                return false;
+            },
+            error: function (xhr, status, error) {
+
+                console.log(xhr.responseText);
+                alert("Error deleting");
+                return false;
+            }
+        });
+    }
+
+    function sendData(devi) {
+       var input = $('#input' + devi).val();
+       var dt = devi + ',' + input
+        console.log("device.device", dt)
+
+            $.ajax({
+                url: "http://192.168.1.69:1880/Command",
+                type: 'get',
+                data: {command: dt},
+                success: function (res) {
+                    // window.location.reload();
+                    console.log("send OK", res)
+                    return false;
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText);return false;
+                }
+            });
+
+    }
+
+    function logData(i) {
+        console.log("aaa", $("#test" + i).val())
+        let data = {device: $("#test" + i).val()}
+        $.ajax({
+
+            url: "/log",
+            type: "post",
+            data: data,
+            success: function (res) {
+                console.log("res", res)
+                window.location.replace("http://localhost:8080/detail_device");
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+    }
+</script>

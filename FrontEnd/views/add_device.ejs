@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+    <style>
+        html {
+            padding: 50px;
+        }
+
+        input[type=text], select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header text-center">
+        <h1>Battery Monitoring System</h1>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/item" class="btn btn-danger btn-sm">Back page</a>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div style="text-align: center; width: 30%; margin: 10px auto" class="well">
+                <h4><span class="fa fa-user"></span> Welcome <%= user.username %></h4>
+            </div>
+        </div>
+        <ol>
+            <li>
+                <div class="col-sm-12 formTable">
+
+                    <form method="post" action="" id="the-form">
+                        <lablel style="color: black; font-size: large" >Add Device Name</lablel>
+                        <input type="text" placeholder="device name" name="device">
+                        <div style="display: none">
+                            <label style="color: black;" class="label">name</label>
+                            <input value="<%= user.username %>" type="text" name="username">
+                        </div>
+                        <!-- <input type="text" placeholder="battery name" name="battery"> -->
+                        <lablel style="color: black; font-size: large" >Add Battery Type</lablel>
+                        <select name="battery" class="battery">
+                          <option value=''>select PIN</option>
+                           <option value="samsung">samsung</option>
+                           <option value="sanyo">sanyo</option>
+                           <option value="general">general</option>
+                        </select>
+                        <input class="btn btn-danger btn-sm" type="submit" value="Add device" onClick="addDevice()">
+
+
+                    </form>
+
+                </div>
+            </li>
+
+        </ol>
+
+
+
+    </div>
+
+
+</div>
+<script>
+
+    // setInterval(()=>{
+    //     window.location.reload();
+    // }, 5000)
+
+    function addDevice() {
+        // window.location.reload();
+        $("select.battery").change(function(){
+            var selected = $(this).children("option:selected").val();
+            console.log("selected", selected)
+        });
+        $.ajax({
+
+            url: "/dashboard",
+            type: "post",
+            data: $("#the-form").serialize(),
+            success: function (res) {
+                console.log("res", res)
+                if(res === "OK"){
+                    window.location.replace("http://localhost:8080/item");
+                }else if(res === "ALREADY"){
+                    alert("The device is already added")
+                    window.location.reload();
+                }else if(res === "NOTHING"){
+                    alert("Type something please!")
+                    window.location.reload();
+                }else{
+                    console.log("None")
+                }
+
+                return false;
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+    }
+
+    function getdata() {
+        $.ajax({
+
+            url: "/dashboard",
+            type: "get",
+            success: function (res) {
+                console.log("res", res)
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+
+    }
+
+    function deleteDevice() {
+        var device = $('#txt_name').val();
+        $.ajax({
+            url: "/devices/" + device,
+            type: 'DELETE',
+            success: function (res) {
+
+                window.location.reload();
+                return false;
+            },
+            error: function (xhr, status, error) {
+
+                console.log(xhr.responseText);
+                alert("Error deleting");
+                return false;
+            }
+        });
+    }
+
+    function deleteUser(user_id) {
+
+        $.ajax({
+            url: "/api/user/" + user_id,
+            type: 'DELETE',
+            success: function (res) {
+
+                window.location.reload();
+                return false;
+            },
+            error: function (xhr, status, error) {
+
+                console.log(xhr.responseText);
+                alert("Error deleting");
+                return false;
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>

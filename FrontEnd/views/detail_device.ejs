@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Data</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+
+    <style>
+        html {
+            padding: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header text-center">
+        <h1>Battery Monitoring System</h1>
+        <a href="/logout" class="btn btn-danger btn-sm">Logout</a>
+        <a href="/item" class="btn btn-danger btn-sm">Back page</a>
+    </div>
+
+    <div id="content" class="table-responsive">
+        <table class="table table-bordered table-first-center table-hover">
+            <thead>
+            <tr>
+                <th style="width: 50px;">No</th>
+                <th scope="col">Device name</th>
+                <th scope="col">Voltage</th>
+                <th scope="col">Property</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col">Battery</th>
+                <th scope="col">Power consumption</th>
+                <th scope="col">Estimated run time</th>
+
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if(data.length){
+
+            for(var i =data.length - 1 ;i >=0 ;i--) { %>
+
+                <tr>
+                    <td><%= data.length - i %></td>
+                    <td><%= data[i].device %></td>
+                    <td><%= data[i].voltage %></td>
+                    <td><%= data[i].prob %></td>
+                    <td><%= data[i].status %></td>
+                    <td><%= data[i].date %></td>
+                    <td><%= data[i].battery %> mah</td>
+                    <td><%= data[i].power_consumption %></td>
+                    <td><%= data[i].estimate_time %></td>
+                    <td><button id="del<%= data[i].id %>" class="btn btn-danger btn-sm" onclick="deleteData(<%= data[i].id %>)">Delete</button></td>
+                </tr>
+            <% }
+
+            }else{ %>
+                <tr>
+                    <td colspan="5">No Data</td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    setInterval(()=>{
+        window.location.reload();
+      //  window.scrollTo(0,document.body.scrollHeight);
+
+    }, 5000)
+
+
+    function deleteData(index) {
+        $.ajax({
+
+            url: "/delete_device/" + index,
+            type: 'DELETE',
+            success: function (res) {
+                console.log("res", res)
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.log(xhr.responseText);
+            }
+
+        });
+    }
+
+</script>

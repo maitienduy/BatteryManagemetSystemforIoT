@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%=title%></title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="../public/css/style.css">
+    </head>
+    <style>
+        body{background:#fff;width:100%}
+        ul.err-area li{color:red}
+        .data-table{float:left;display:inline-block}
+        .data-table table{border-collapse:collapse;border:1px solid #ddd;}
+        .page-data{float:left;display:inline-block;}
+
+    </style>
+<body>
+<div class="data-table">
+    <table border="1" cellpadding="7" cellspacing="7">
+        <tr>
+            <th width="50px">No</th>
+            <th>device</th>
+            <th>status</th>
+            <th>property</th>
+        </tr>
+                       
+        <% if(data.length){ 
+                        
+         for(var i = 0;i < data.length;i++) { %>
+         
+        <tr>
+            <td><%=(i+1)%></td>
+            <td><%=data[i].device%></td>
+            <td><%=data[i].status%></td>
+            <td><%=data[i].property%></td>
+        </tr>
+    <% }
+    
+     }else{ %>
+         <tr>
+            <td colspan="5">No Data</td>
+         </tr>
+    <% } %>
+                                      
+    </table>
+</div>
+<div class="page-data">
+    
+    <form method="post" action="" id="the-form">
+        <table cellpadding="11">
+        <tr>
+            <td class="label">device</td><td>: <input type="text" name="device"></td>
+         </tr>
+        <tr>
+            <td class="label">status</td><td>: <input type="text" name="status"></td>
+         </tr>
+          <tr>
+            <td class="label">property</td><td>: <input type="text" name="property"></td>
+         </tr>
+         <tr>
+            <td class="label"></td>
+            <td>
+                &nbsp; <input type="button" value="Save" onClick="saveUser()">
+            </td>
+         </tr>
+        </table>
+    </form>
+</div>
+<div class="page-data">
+     <ul class="err-area"></ul>
+</div>
+
+<script>
+
+    function saveUser(){
+       
+       $.ajax({
+        
+        url:"/api/user",
+        type:"post",
+        data:$("#the-form").serialize(),
+        success:function(res){
+            
+            window.location.reload();
+            return false;
+        },
+        error:function(xhr, status, error){
+            
+            console.log(xhr.responseText);
+            var err = '';
+            $.each(JSON.parse(xhr.responseText) , function(i, item) {
+               
+                 err +='<li>'+item.msg+'</li>';
+            });
+            $(".err-area").html(err);    
+            return false;
+        }
+        
+       });
+    }
+    
+    function deleteUser(user_id){
+    
+        $.ajax({
+            url:"/api/user/"+user_id,
+            type: 'DELETE',
+            success: function(res) {
+                
+                window.location.reload();
+                return false;
+            },
+            error:function(xhr, status, error){
+            
+                console.log(xhr.responseText);
+                alert("Error deleting");
+                return false;
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
